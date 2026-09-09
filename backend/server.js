@@ -21,13 +21,40 @@ const CORS_ORIGINS = (process.env.CORS_ORIGINS || 'http://localhost:5173,http://
   .split(',')
   .map((origin) => origin.trim())
   .filter(Boolean);
+const isOriginAllowed = (origin) => {
+  if (!origin) return true;
+
+  const normalizedOrigin = origin.trim().replace(/\/+$/, '');
+
+  if (CORS_ORIGINS.includes(normalizedOrigin)) return true;
+
+  for (const allowed of CORS_ORIGINS) {
+    if (!allowed) continue;
+    const safePattern = allowed
+      .trim()
+      .replace(/\/+$/, '')
+      .replace(/[.+?^${}()|[\]\\]/g, '\\$&')
+      .replace(/\\\*/g, '.*');
+
+    if (new RegExp(`^${safePattern}$`, 'i').test(normalizedOrigin)) {
+      return true;
+    }
+  }
+
+  try {
+    const hostname = new URL(normalizedOrigin).hostname;
+    return hostname.endsWith('.vercel.app') || hostname === 'vercel.app';
+  } catch {
+    return false;
+  }
+};
 const YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY;
-const WATCH_REWARD_RWF_PER_MINUTE = Math.max(1, Math.floor(Number(process.env.WATCH_REWARD_RWF_PER_MINUTE || 1)));
+const WATCH_REWARD_RWF_PER_MINUTE = Math.max(1, Math.floor(Number(process.env.WATCH_REWARD_RWF_PER_MINUTE)));
 const MINIMUM_VIEW_SECONDS = 45;
 const MAX_WATCH_UPDATE_SECONDS = 15;
-const DAILY_REWARD_LIMIT_RWF = Math.max(1, Math.floor(Number(process.env.DAILY_REWARD_LIMIT_RWF || 5000)));
+const DAILY_REWARD_LIMIT_RWF = Math.max(1, Math.floor(Number(process.env.DAILY_REWARD_LIMIT_RWF )));
 
-if (NODE_ENV === 'production' && JWT_SECRET === 'your_super_secret_jwt_key_here_change_this') {
+if (NODE_ENV === 'production' && JWT_SECRET ) {
   throw new Error('JWT_SECRET must be configured in production');
 }
 const PREMIUM_PLANS = {
@@ -2068,7 +2095,7 @@ app.use(helmet({
 }));
 app.use(cors({
   origin: (origin, callback) => {
-    if (!origin || CORS_ORIGINS.includes(origin)) return callback(null, true);
+    if (isOriginAllowed(origin)) return callback(null, true);
     return callback(new Error('Origin not allowed by CORS'));
   },
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
@@ -2194,7 +2221,7 @@ const startServer = () => connectDB().then(async () => {
 
 if (require.main === module) startServer();
 
-module.exports = { app, startServer, connectDB, User, Channel, Video, WatchHistory, WatchSession, ViewAudit, WalletTransaction, AdminAudit };
+module.exports = { app, startServer, connectDB, User, Channel, Video, WatchHistory, WatchSession, ViewAudit, WalletTransaction, AdminAudit, isOriginAllowed };
 
 // Handle unhandled promise rejections
 process.on('unhandledRejection', (err) => {

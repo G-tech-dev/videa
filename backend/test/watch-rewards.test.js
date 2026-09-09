@@ -10,7 +10,8 @@ const {
   Video,
   WatchHistory,
   WatchSession,
-  WalletTransaction
+  WalletTransaction,
+  isOriginAllowed
 } = require('../server');
 
 let mongo;
@@ -61,6 +62,11 @@ test.before(async () => {
 
 test.beforeEach(async () => {
   await Promise.all([User.deleteMany({}), Channel.deleteMany({}), Video.deleteMany({}), WatchHistory.deleteMany({}), WatchSession.deleteMany({}), WalletTransaction.deleteMany({})]);
+});
+
+test('allows Vercel wildcard origins for API requests', () => {
+  assert.equal(isOriginAllowed('https://videa-8uvr49hqc-gibbor-s-projects.vercel.app'), true);
+  assert.equal(isOriginAllowed('https://example.com'), false);
 });
 
 test.after(async () => {
