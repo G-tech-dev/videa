@@ -2,6 +2,7 @@ services:
   - type: web
     name: videa-api
     runtime: docker
+    plan: free
     dockerfilePath: ./backend/Dockerfile
     dockerContext: ./backend
     healthCheckPath: /api/health
