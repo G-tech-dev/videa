@@ -1,0 +1,7 @@
+import { NavLink, Outlet } from 'react-router-dom'
+import { useAdmin } from '../context/AdminContext'
+
+export default function AdminLayout() {
+  const { session, logout } = useAdmin()
+  return <div className="app-shell"><aside><div className="brand"><span className="brand-mark">V</span><span>VIDEA<span className="muted"> / ADMIN</span></span></div><div className="side-label">Workspace</div><nav className="admin-nav"><NavLink to="/admin" end className={({ isActive }) => isActive ? 'nav-active' : 'nav-link'}>◈ <span>Overview</span></NavLink><NavLink to="/admin/payments" className={({ isActive }) => isActive ? 'nav-active' : 'nav-link'}>↕ <span>Payments</span></NavLink><NavLink to="/admin/videos" className={({ isActive }) => isActive ? 'nav-active' : 'nav-link'}>▣ <span>Videos</span></NavLink><NavLink to="/admin/users" className={({ isActive }) => isActive ? 'nav-active' : 'nav-link'}>♙ <span>Users</span></NavLink><NavLink to="/admin/security" className={({ isActive }) => isActive ? 'nav-active' : 'nav-link'}>! <span>Security</span></NavLink><NavLink to="/admin/settings" className={({ isActive }) => isActive ? 'nav-active' : 'nav-link'}>⚙ <span>Settings</span></NavLink></nav><div className="side-label">Signed in as</div><div className="profile"><strong>{session.user.username}</strong><span>Administrator</span></div><button className="logout" onClick={logout}>Sign out</button></aside><main className="content"><Outlet /></main></div>
+}
