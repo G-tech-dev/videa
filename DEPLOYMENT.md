@@ -28,9 +28,14 @@ If the remote already exists, use `git remote set-url origin https://github.com/
 
 5. Deploy. `frontend/vercel.json` keeps React Router routes working after a refresh.
 
-## Backend hosting
+## Backend hosting on Render
 
-Vercel does not run the backend Docker container as a persistent Express service. Deploy `backend/` to a container host such as Render, Railway, Fly.io, or an equivalent service using `backend/Dockerfile`.
+Vercel does not run the backend Docker container as a persistent Express service. This repository includes `render.yaml` for deploying the API to Render with `backend/Dockerfile`.
+
+1. Open Render and choose **New > Blueprint**.
+2. Connect `G-tech-dev/videa` and select the `main` branch.
+3. Render detects `render.yaml` and creates the `videa-api` web service.
+4. Set the secret environment variables when prompted:
 
 Set these backend environment variables on that host:
 
