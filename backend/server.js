@@ -1950,17 +1950,24 @@ const getAdminUsers = async (req, res) => {
   }
 };
 
-// @desc    Update a user's role or active state
+// @desc    Update a user's role, access, or premium state
 // @route   PATCH /api/admin/users/:id
 const updateAdminUser = async (req, res) => {
   try {
-    const { role, isActive } = req.body;
+    const { role, isActive, isPremium, premiumPlan } = req.body;
     const allowedRoles = ['viewer', 'creator', 'both', 'admin'];
+    const allowedPremiumPlans = ['basic', 'pro', 'elite'];
     if (role !== undefined && !allowedRoles.includes(role)) {
       return res.status(400).json({ success: false, message: 'Invalid user role' });
     }
     if (isActive !== undefined && typeof isActive !== 'boolean') {
       return res.status(400).json({ success: false, message: 'isActive must be a boolean' });
+    }
+    if (isPremium !== undefined && typeof isPremium !== 'boolean') {
+      return res.status(400).json({ success: false, message: 'isPremium must be a boolean' });
+    }
+    if (premiumPlan !== undefined && !allowedPremiumPlans.includes(premiumPlan)) {
+      return res.status(400).json({ success: false, message: 'Invalid premium plan' });
     }
     if (req.params.id === req.user._id.toString() && (role !== undefined && role !== 'admin' || isActive === false)) {
       return res.status(400).json({ success: false, message: 'You cannot remove your own administrator access' });
@@ -1969,6 +1976,8 @@ const updateAdminUser = async (req, res) => {
     const updates = {};
     if (role !== undefined) updates.role = role;
     if (isActive !== undefined) updates.isActive = isActive;
+    if (isPremium !== undefined) updates.isPremium = isPremium;
+    if (premiumPlan !== undefined) updates.premiumPlan = premiumPlan;
     const user = await User.findByIdAndUpdate(req.params.id, updates, { new: true, runValidators: true }).select('-password');
     if (!user) return res.status(404).json({ success: false, message: 'User not found' });
     await writeAdminAudit(req, 'user_updated', 'User', user._id, updates);
