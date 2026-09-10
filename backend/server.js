@@ -17,7 +17,7 @@ const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/watcht
 const JWT_SECRET = process.env.JWT_SECRET || 'your_super_secret_jwt_key_here_change_this';
 const JWT_EXPIRE = process.env.JWT_EXPIRE || '7d';
 const NODE_ENV = process.env.NODE_ENV || 'development';
-const CORS_ORIGINS = (process.env.CORS_ORIGINS || 'http://localhost:5173,http://localhost:5174')
+const CORS_ORIGINS = (process.env.CORS_ORIGINS || 'http://localhost:5173,http://localhost:5174,https://videa-one.vercel.app')
   .split(',')
   .map((origin) => origin.trim())
   .filter(Boolean);
@@ -2098,7 +2098,7 @@ app.use(cors({
     if (isOriginAllowed(origin)) return callback(null, true);
     return callback(new Error('Origin not allowed by CORS'));
   },
-  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true
 }));
