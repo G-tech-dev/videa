@@ -54,7 +54,7 @@ const MINIMUM_VIEW_SECONDS = 45;
 const MAX_WATCH_UPDATE_SECONDS = 15;
 const DAILY_REWARD_LIMIT_RWF = Math.max(1, Math.floor(Number(process.env.DAILY_REWARD_LIMIT_RWF )));
 
-if (NODE_ENV === 'production' && JWT_SECRET ) {
+if (NODE_ENV === 'production' && !process.env.JWT_SECRET) {
   throw new Error('JWT_SECRET must be configured in production');
 }
 const PREMIUM_PLANS = {
