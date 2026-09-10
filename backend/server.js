@@ -2201,23 +2201,26 @@ app.use((err, req, res, next) => {
 
 // ==================== START SERVER ====================
 
-// Connect to database and start server
-const startServer = () => connectDB().then(async () => {
-  await seedSampleUsers();
-  await PlatformWallet.updateOne(
-    { key: 'primary' },
-    { $setOnInsert: { key: 'primary', registeredName: 'Uzamukunda Seraphine', phoneNumber: '0796319967', provider: 'mtn' } },
-    { upsert: true }
-  );
+// Bind the port before database initialization so the platform health check can
+// distinguish a live API from a database configuration failure.
+const startServer = () => {
   app.listen(PORT, () => {
     console.log(`🚀 Server running on http://localhost:${PORT}`);
     console.log(`📊 API Documentation available at /api/health`);
     console.log(`🔐 JWT Secret: ${JWT_SECRET ? '✅ Set' : '❌ Not set'}`);
   });
-}).catch(err => {
-  console.error('❌ Failed to connect to database:', err);
-  process.exit(1);
-});
+
+  return connectDB().then(async () => {
+    await seedSampleUsers();
+    await PlatformWallet.updateOne(
+      { key: 'primary' },
+      { $setOnInsert: { key: 'primary', registeredName: 'Uzamukunda Seraphine', phoneNumber: '0796319967', provider: 'mtn' } },
+      { upsert: true }
+    );
+  }).catch(err => {
+    console.error('❌ Failed to connect to database:', err);
+  });
+};
 
 if (require.main === module) startServer();
 
